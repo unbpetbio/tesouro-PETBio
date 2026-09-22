@@ -13,6 +13,8 @@
         .success { background: #ffe082; padding: 20px; border-radius: 10px; display: none; margin-top:20px; border: 2px solid #ffca28; }
         .success h2 { margin: 0 0 10px 0; color: #d84315; }
         button { padding: 10px 20px; background: #ff7043; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .curiosity { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left; font-size: 15px; border-left: 4px solid #4CAF50;}
+        .hint { font-weight: bold; color: #d32f2f; }
     </style>
 </head>
 <body>
@@ -31,25 +33,45 @@
     <div id="success" class="success">
         <h2>🎉 PARABÉNS! 🎉</h2>
         <p>Você coletou a palavra <strong>POLINIZAR</strong>!</p>
-        <p>Mostre esta tela para a equipe no estande do PET para retirar seu prêmio.</p>
+        <p>Mostre esta tela no estande do PET Bio para retirar seu prêmio.</p>
         <br>
         <button onclick="localStorage.clear(); location.href='?p=0'">Resetar Jogo</button>
     </div>
 
     <script>
-        // Dados de cada etapa conectados aos seus arquivos originais
         const pistas = {
-            1: { img: "image_853cc5.png", silaba: "PO", texto: "Sou a abelha! Próxima pista: no pé da mesa principal." },
-            2: { img: "image_853ce9.png", silaba: "LI", texto: "Achou o inseto! Próxima pista: vigiando a porta." },
-            3: { img: "image_853ce3.png", silaba: "NI", texto: "Sou a mariposa! Próxima pista: perto do bebedouro." },
-            4: { img: "image_853caa.png", silaba: "ZAR", texto: "Sou o morcego! Volte ao estande para receber seu prêmio." }
+            1: { 
+                img: "image_853cc5.png", 
+                silaba: "PO", 
+                texto: "Sou a abelha!",
+                curiosidade: "🐝 Sabia que muitas abelhas nativas do Brasil (como a Jataí) não têm ferrão? Elas são essenciais para manter a biodiversidade do nosso Cerrado florida.",
+                dica: "Próxima pista: procure no pé da mesa principal." 
+            },
+            2: { 
+                img: "image_853ce9.png", 
+                silaba: "LI", 
+                texto: "Sou o inseto (besouro/vespa)!",
+                curiosidade: "🪲 Os besouros estão entre os polinizadores mais antigos do planeta! Eles já visitavam flores milhões de anos antes das abelhas existirem.",
+                dica: "Próxima pista: estou vigiando a porta de entrada/saída." 
+            },
+            3: { 
+                img: "image_853ce3.png", 
+                silaba: "NI", 
+                texto: "Sou a mariposa!",
+                curiosidade: "🦋 Nós somos as polinizadoras do turno da noite! Plantas polinizadas por mariposas costumam ter flores brancas e muito cheirosas para nos guiar no escuro.",
+                dica: "Próxima pista: perto de onde você pode beber água." 
+            },
+            4: { 
+                img: "image_853caa.png", 
+                silaba: "ZAR", 
+                texto: "Sou o morcego!",
+                curiosidade: "🦇 Ao contrário do que pensam, adoramos néctar! No Cerrado, somos grandes responsáveis pela polinização de árvores importantes, como o pequizeiro.",
+                dica: "Volte ao estande do PET para receber seu prêmio!" 
+            }
         };
 
-        // Captura qual pista o usuário acabou de escanear (ex: ?p=1)
         const urlParams = new URLSearchParams(window.location.search);
         const p = urlParams.get('p');
-
-        // Puxa o progresso salvo no celular do visitante
         let inventario = JSON.parse(localStorage.getItem('polen_inv')) || {};
 
         if (p && pistas[p]) {
@@ -57,15 +79,16 @@
             localStorage.setItem('polen_inv', JSON.stringify(inventario));
 
             document.getElementById('content').innerHTML = `
-                <img src="${pistas[p].img}" alt="Polinizador">
-                <h2>Sílaba coletada: ${pistas[p].silaba}</h2>
+                <img src="${pistas[p].img}" alt="Imagem do Polinizador">
+                <h2>Sílaba: <span style="color: #4CAF50;">${pistas[p].silaba}</span></h2>
                 <p><strong>${pistas[p].texto}</strong></p>
+                <div class="curiosity">${pistas[p].curiosidade}</div>
+                <p class="hint">👉 ${pistas[p].dica}</p>
             `;
         } else {
             document.getElementById('content').innerHTML = "<p>Escaneie um dos QR Codes do estande para começar a caçada!</p>";
         }
 
-        // Atualiza os blocos visuais na tela
         let coletados = 0;
         for (let i = 1; i <= 4; i++) {
             if (inventario[i]) {
@@ -75,7 +98,6 @@
             }
         }
 
-        // Libera a tela de vitória quando atingir 4
         if (coletados === 4) {
             document.getElementById('success').style.display = 'block';
             document.getElementById('content').style.display = 'none';
