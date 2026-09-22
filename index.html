@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caminho do Pólen</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; background-color: #f2f9f1; color: #333; }
+        .bag { display: flex; justify-content: center; gap: 10px; margin: 20px 0; font-size: 24px; font-weight: bold; }
+        .slot { padding: 15px 20px; background: #ddd; border-radius: 8px; border: 2px dashed #999; }
+        .collected { background: #4CAF50; color: white; border: 2px solid #2e7d32; }
+        img { max-width: 250px; border-radius: 10px; margin: 15px 0; image-rendering: pixelated; }
+        .success { background: #ffe082; padding: 20px; border-radius: 10px; display: none; margin-top:20px; border: 2px solid #ffca28; }
+        .success h2 { margin: 0 0 10px 0; color: #d84315; }
+        button { padding: 10px 20px; background: #ff7043; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>Caça aos Polinizadores</h1>
+    <div id="content">Carregando pista...</div>
+
+    <h3>Seu Inventário:</h3>
+    <div class="bag">
+        <div id="s1" class="slot">?</div>
+        <div id="s2" class="slot">?</div>
+        <div id="s3" class="slot">?</div>
+        <div id="s4" class="slot">?</div>
+    </div>
+
+    <div id="success" class="success">
+        <h2>🎉 PARABÉNS! 🎉</h2>
+        <p>Você coletou a palavra <strong>POLINIZAR</strong>!</p>
+        <p>Mostre esta tela para a equipe no estande do PET para retirar seu prêmio.</p>
+        <br>
+        <button onclick="localStorage.clear(); location.href='?p=0'">Resetar Jogo</button>
+    </div>
+
+    <script>
+        // Dados de cada etapa conectados aos seus arquivos originais
+        const pistas = {
+            1: { img: "image_853cc5.png", silaba: "PO", texto: "Sou a abelha! Próxima pista: no pé da mesa principal." },
+            2: { img: "image_853ce9.png", silaba: "LI", texto: "Achou o inseto! Próxima pista: vigiando a porta." },
+            3: { img: "image_853ce3.png", silaba: "NI", texto: "Sou a mariposa! Próxima pista: perto do bebedouro." },
+            4: { img: "image_853caa.png", silaba: "ZAR", texto: "Sou o morcego! Volte ao estande para receber seu prêmio." }
+        };
+
+        // Captura qual pista o usuário acabou de escanear (ex: ?p=1)
+        const urlParams = new URLSearchParams(window.location.search);
+        const p = urlParams.get('p');
+
+        // Puxa o progresso salvo no celular do visitante
+        let inventario = JSON.parse(localStorage.getItem('polen_inv')) || {};
+
+        if (p && pistas[p]) {
+            inventario[p] = pistas[p].silaba;
+            localStorage.setItem('polen_inv', JSON.stringify(inventario));
+
+            document.getElementById('content').innerHTML = `
+                <img src="${pistas[p].img}" alt="Polinizador">
+                <h2>Sílaba coletada: ${pistas[p].silaba}</h2>
+                <p><strong>${pistas[p].texto}</strong></p>
+            `;
+        } else {
+            document.getElementById('content').innerHTML = "<p>Escaneie um dos QR Codes do estande para começar a caçada!</p>";
+        }
+
+        // Atualiza os blocos visuais na tela
+        let coletados = 0;
+        for (let i = 1; i <= 4; i++) {
+            if (inventario[i]) {
+                document.getElementById('s' + i).innerText = inventario[i];
+                document.getElementById('s' + i).classList.add('collected');
+                coletados++;
+            }
+        }
+
+        // Libera a tela de vitória quando atingir 4
+        if (coletados === 4) {
+            document.getElementById('success').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
